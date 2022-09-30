@@ -10,6 +10,7 @@ import (
 func main() {
 	app := fiber.New()
 
+	// The frontend application.
 	app.Use("/", filesystem.New(filesystem.Config{
 		Root:         http.FS(bundle),
 		PathPrefix:   "app/dist",
