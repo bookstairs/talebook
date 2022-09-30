@@ -10,21 +10,22 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "core-js": "^3.19.3",
+    "core-js": "^3.25.3",
     "nuxt": "^2.15.8",
-    "vue": "^2.6.14",
-    "vue-cookies": "^1.7.4",
-    "vue-server-renderer": "^2.6.14",
-    "vue-template-compiler": "^2.6.14",
-    "vuetify": "^2.6.1",
+    "vue": "^2.7.10",
+    "vue-cookies": "^1.8.1",
+    "vue-server-renderer": "^2.7.10",
+    "vue-template-compiler": "^2.7.10",
+    "vuetify": "^2.6.10",
     "webpack": "^4.46.0"
   },
   "devDependencies": {
-    "@mdi/font": "^6.5.95",
+    "@mdi/font": "^7.0.96",
+    "@nuxt/types": "^2.15.8",
     "@nuxtjs/google-analytics": "^2.4.0",
     "@nuxtjs/google-fonts": "^1.3.0",
     "@nuxtjs/vuetify": "^1.12.3",
     "connect-logger": "^0.0.1",
-    "material-design-icons-iconfont": "^6.4.1"
+    "material-design-icons-iconfont": "^6.7.0"
   }
 }

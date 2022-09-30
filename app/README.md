@@ -1,5 +1,8 @@
 # talebook
 
+This is a fork from original [talebook](https://github.com/talebook/talebook) project.
+We didn't modify anything but just to keep the same project structure for we can sync the code from it.
+
 ## Build Setup
 
 ```bash

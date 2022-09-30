@@ -1,6 +1,7 @@
 export default {
   srcDir: 'src/',
   // Global page headers: https://go.nuxtjs.dev/config-head
+  ssr: false,
   head: {
     title: "talebook",
     titleTemplate: "%s | talebook",
