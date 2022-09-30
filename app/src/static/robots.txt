@@ -1,0 +1,24 @@
+User-agent: *
+Disallow: /login
+
+User-agent: *
+Disallow: /read
+
+User-agent: *
+Disallow: /opds/
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: Exabot
+Disallow: /
+
