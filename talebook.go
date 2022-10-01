@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/bookstairs/talebook/config"
+	"github.com/bookstairs/talebook/handlers"
 )
 
 const (
@@ -52,7 +53,7 @@ func NewRootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use: "talebook",
 		Short: "Talebook (in Golang)\n\n" +
-			"This a fork of github.com/talebook/talebook. Serve as your personal library.\n" +
+			"This a fork of github.com/talebook/talebook. Serve as your personal library.\n\n" +
 			config.TalebookVersion().String() +
 			"\n",
 		Version: config.TalebookVersion().String(),
@@ -70,10 +71,14 @@ func NewRootCommand() *cobra.Command {
 				CalibreDB:   calibreDB,
 				Convert:     convert,
 				Debug:       debug,
+				Frontend:    frontend,
 			}
 
+			// Create working directories and perform other checks.
+			initRuntime(c)
+
 			// Bootstrap the talebook server.
-			StartServer(c)
+			handlers.StartServer(c)
 		},
 	}
 

@@ -1,10 +1,8 @@
-package main
+package handlers
 
 import (
-	"errors"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -16,16 +14,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 
-	"github.com/bookstairs/talebook/calibre"
 	"github.com/bookstairs/talebook/config"
-	"github.com/bookstairs/talebook/handlers"
 )
 
 // StartServer will start the talebook server.
 func StartServer(c *config.ServerConfig) {
-	// Create working directories.
-	createWorkingPaths(c)
-
 	// Create fiber application.
 	app := fiber.New(fiber.Config{
 		AppName:                 "Talebook",
@@ -67,7 +60,7 @@ func StartServer(c *config.ServerConfig) {
 	}
 
 	// Add API backend.
-	handlers.RegisterHandlers(app)
+	registerHandlers(app)
 
 	// Allow end user to add custom frontend files.
 	// This would override the default frontend files. Use it at your own risk.
@@ -75,7 +68,7 @@ func StartServer(c *config.ServerConfig) {
 
 	// The frontend application.
 	app.Use("/", filesystem.New(filesystem.Config{
-		Root:         http.FS(frontend),
+		Root:         http.FS(c.Frontend),
 		PathPrefix:   "app/dist",
 		Browse:       false,
 		Index:        "index.html",
@@ -85,47 +78,4 @@ func StartServer(c *config.ServerConfig) {
 
 	// Listen on given port.
 	log.Fatal(app.Listen(":" + strconv.Itoa(c.Port)))
-}
-
-// createWorkingPaths will create all the required working directory.
-func createWorkingPaths(c *config.ServerConfig) {
-	// Internal method for making all the directories if it's not existed.
-	createPath := func(path string) {
-		if err := os.MkdirAll(path, os.ModePerm); err != nil {
-			log.Fatal(err)
-		}
-	}
-	// Internal method for checking if a file exists.
-	fileExist := func(path string) bool {
-		_, err := os.Stat(path)
-		if err != nil && !errors.Is(err, os.ErrNotExist) {
-			// We can't access this file because it's unreachable.
-			log.Fatal(err)
-		}
-		return err == nil
-	}
-
-	// Create all the working directories if they are not existed.
-	createPath(c.GetPath("statics"))
-	createPath(c.LibraryPath)
-
-	// Check the calibredb
-	if !fileExist(c.CalibreDB) {
-		log.Fatal("No calibredb could be found on path:", c.CalibreDB, "check or provide a new path through cmd line.")
-	}
-
-	// Check the ebook-convert
-	if !fileExist(c.Convert) {
-		log.Fatal("No ebook-convert could be found on path:", c.Convert, "check or provide a new path through cmd line.")
-	}
-
-	// Extract the default calibre library in case of failure.
-	if !fileExist(calibre.GetDatabase(c.LibraryPath)) {
-		log.Print("No calibre library found extract the default library.")
-		err := extractDefaultLibrary(c.LibraryPath)
-		if err != nil {
-			// Use log.Fatal may not execute the defer method.
-			log.Fatal(err)
-		}
-	}
 }

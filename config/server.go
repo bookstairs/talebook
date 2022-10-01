@@ -1,22 +1,23 @@
 package config
 
 import (
+	"embed"
 	"log"
 	"os"
 	"path/filepath"
-
-	"github.com/bookstairs/talebook/calibre"
 )
 
+// ServerConfig is used to start the fiber server.
 type ServerConfig struct {
-	Port        int    // The binding port for backend server.
-	WorkingPath string // The working directory for talebook.
-	LibraryPath string // The calibre library directory.
-	EncryptKey  string // This is used to encrypt the cookie.
-	Limit       int    // Allowed request per seconds.
-	CalibreDB   string // The executable file calibredb for adding books.
-	Convert     string // The executable file ebook-convert for converting books.
-	Debug       bool   // Enable debug log and metrics monitor and anything else.
+	Port        int      // The binding port for backend server.
+	WorkingPath string   // The working directory for talebook.
+	LibraryPath string   // The calibre library directory.
+	EncryptKey  string   // This is used to encrypt the cookie.
+	Limit       int      // Allowed request per seconds.
+	CalibreDB   string   // The executable file calibredb for adding books.
+	Convert     string   // The executable file ebook-convert for converting books.
+	Debug       bool     // Enable debug log and metrics monitor and anything else.
+	Frontend    embed.FS // The embed static files.
 }
 
 func (c *ServerConfig) GetPath(paths ...string) string {
@@ -36,8 +37,8 @@ func DefaultSeverConfig() *ServerConfig {
 		LibraryPath: filepath.Join(w, "library"),
 		EncryptKey:  "this-is-an-encrypt-key",
 		Limit:       100,
-		CalibreDB:   calibre.DefaultCalibreDB,
-		Convert:     calibre.DefaultConvert,
+		CalibreDB:   defaultCalibreDB,
+		Convert:     defaultConvert,
 		Debug:       false,
 	}
 }
