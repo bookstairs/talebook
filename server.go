@@ -1,14 +1,13 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
-
-	"github.com/bookstairs/talebook/calibre"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
@@ -18,6 +17,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 
+	"github.com/bookstairs/talebook/calibre"
 	"github.com/bookstairs/talebook/handlers"
 )
 
@@ -109,7 +109,7 @@ func StartServer(c *ServerConfig) {
 
 	// The frontend application.
 	app.Use("/", filesystem.New(filesystem.Config{
-		Root:         http.FS(bundle),
+		Root:         http.FS(frontend),
 		PathPrefix:   "app/dist",
 		Browse:       false,
 		Index:        "index.html",
@@ -123,13 +123,31 @@ func StartServer(c *ServerConfig) {
 
 // createWorkingPaths will create all the required working directory.
 func createWorkingPaths(c *ServerConfig) {
-	// Internal methods for making all the directories if it's not existed.
-	createPath := func(subPaths ...string) {
-		newPath := c.GetPath(subPaths...)
-		if err := os.MkdirAll(newPath, os.ModePerm); err != nil {
+	// Internal method for making all the directories if it's not existed.
+	createPath := func(path string) {
+		if err := os.MkdirAll(path, os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
 	}
+	// Internal method for checking if a file exists.
+	fileExist := func(path string) bool {
+		_, err := os.Stat(path)
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			log.Fatal(err)
+		}
+		return err != nil
+	}
 
-	createPath("statics")
+	// Create all the working directories if they are not existed.
+	createPath(c.GetPath("statics"))
+	createPath(c.LibraryPath)
+
+	// Extract the default calibre library in case of failure.
+	if !fileExist(calibre.GetDatabase(c.LibraryPath)) {
+		err := extractDefaultLibrary(c.LibraryPath)
+		if err != nil {
+			// Use log.Fatal may not execute the defer method.
+			log.Fatal(err)
+		}
+	}
 }
