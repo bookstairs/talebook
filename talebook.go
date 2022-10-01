@@ -12,6 +12,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
+
+	"github.com/bookstairs/talebook/handlers"
 )
 
 func main() {
@@ -52,6 +54,9 @@ func main() {
 
 	// Add a metrics monitor. FIXME This should be enabled with debug purpose.
 	app.Get("/metrics", monitor.New(monitor.Config{Title: "Talebook Monitor"}))
+
+	// Add API backend
+	handlers.RegisterHandlers(app)
 
 	// The frontend application.
 	app.Use("/", filesystem.New(filesystem.Config{
