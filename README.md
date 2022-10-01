@@ -1,10 +1,10 @@
 # Talebook (Golang)
 
 The Golang implementation for [talebook](https://github.com/talebook/talebook).
-We only reuse the frontend code and backend in Golang.
+We only reuse the frontend code and rewrite backend in Golang.
 
 In order to make it compatible with the original talebook, we will keep using the calibre as the book manager.
-So you have to deploy this talebook fork in docker. But this will makes it easy to fallback use the Calibre application.
+So you have to deploy this talebook fork in docker. But this will make it easy to fallback use the Calibre application.
 
 ## Talebook API implementation status
 

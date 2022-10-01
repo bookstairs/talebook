@@ -33,7 +33,7 @@ linters-settings:
       - whyNoLint
       - wrapperFunc
   goimports:
-    local-prefixes: github.com/bookstairs/bookstairs
+    local-prefixes: github.com/bookstairs/talebook
 
   govet:
     check-shadowing: true
@@ -91,7 +91,6 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -114,15 +113,12 @@ linters:
     - noctx
     - nolintlint
     - staticcheck
-    - structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
-    - deadcode
     - bodyclose
 
 issues:
