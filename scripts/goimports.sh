@@ -53,12 +53,13 @@ function parse_file_hook_args {
 	done
 }
 
+parse_file_hook_args "$@"
+
+##
 # Remove all blank lines in go 'imports' statements, then sort with default goimports.
 # This scripts only works in macOS with `brew install gnu-sed`
 # Change gsed to sed in case of you are developing under the Linux.
-
-parse_file_hook_args "$@"
-
+#
 for file in "${FILES[@]}"; do
   gsed -i '
     /^import/,/)/ {

@@ -51,7 +51,12 @@ func initRuntime(c *config.ServerConfig) {
 		err := extractDefaultLibrary(c.LibraryPath)
 		if err != nil {
 			// Use log.Fatal may not execute the defer method.
-			log.Fatal(err)
+			log.Fatal("Couldn't initialize the calibre library.", err)
 		}
+	}
+
+	// Initialize the calibre library connection.
+	if err := calibre.Reconnect(c.LibraryPath); err != nil {
+		log.Fatal("Couldn't initialize the calibre database connection.", err)
 	}
 }

@@ -4,15 +4,14 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/glebarez/sqlite"
-	"gorm.io/gorm"
+	"zombiezen.com/go/sqlite"
 )
 
 var (
 	// The calibre database path.
 	currentPath string
 	// We will hold this instance for caching the connection pool.
-	db *gorm.DB
+	db *sqlite.Conn
 )
 
 // database is the file for storing the calibre data
@@ -24,9 +23,10 @@ func GetDatabase(librayPath string) string {
 }
 
 // DB will return a calibre connection pool.
-func DB() *gorm.DB {
+// We use a pure-go implementation of the https://github.com/crawshaw/sqlite for better performance.
+func DB() *sqlite.Conn {
 	if db == nil {
-		log.Fatalln("Wrong calibre initialization")
+		log.Fatalln("Wrong calibre initialization.")
 	}
 
 	return db
@@ -41,17 +41,19 @@ func Reconnect(libraryPath string) error {
 		currentPath = dbPath
 	}
 
-	// Close old connection.
-	connect, err := db.DB()
-	if err != nil {
-		return err
-	}
-	err = connect.Close()
-	if err != nil {
-		return err
+	// Close old connection if exists.
+	if db != nil {
+		if err := db.Close(); err != nil {
+			return err
+		}
 	}
 
 	// Create new connection.
-	db, err = gorm.Open(sqlite.Open(currentPath))
+	conn, err := sqlite.OpenConn(currentPath, sqlite.OpenReadOnly, sqlite.OpenSharedCache)
+	if err != nil {
+		return err
+	}
+	db = conn
+
 	return err
 }
