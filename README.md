@@ -6,6 +6,11 @@ We only reuse the frontend code and rewrite backend in Golang.
 In order to make it compatible with the original talebook, we will keep using the calibre as the book manager.
 So you have to deploy this talebook fork in docker. But this will make it easy to fallback use the Calibre application.
 
+## Develop Guide
+
+We use [pre-commit](https://pre-commit.com/) for formatting the code and lint before commit. Remember to install it.
+Golang and Node.js are required for developing. Remember to install them.
+
 ## Talebook API implementation status
 
 ### Books API
