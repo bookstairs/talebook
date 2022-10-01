@@ -1,0 +1,25 @@
+## This is a sample configuration file for talebook
+
+# The binding port for backend server.
+port: 8000
+
+# The working directory for talebook.
+workingPath: "."
+
+# The calibre library directory.
+libraryPath: "./library"
+
+# This is used to encrypt the cookie.
+encryptKey: "some-key"
+
+# Allowed request per seconds.
+limit: 300
+
+# The executable file calibredb for adding books.
+calibreDB: "/usr/bin/calibredb"
+
+# The executable file ebook-convert for converting books.
+convert: "/usr/bin/ebook-convert"
+
+# Enable debug log and metrics monitor and anything else.
+debug: false
