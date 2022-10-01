@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -62,5 +63,6 @@ func main() {
 		MaxAge:       3600,
 	}))
 
-	app.Listen(":8000")
+	// Listen on given port.
+	log.Fatal(app.Listen(":8000"))
 }

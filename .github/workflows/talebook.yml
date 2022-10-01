@@ -1,0 +1,52 @@
+## This pipeline is used for testing and building backend golang application.
+name: Talebook CI
+on: [ push, pull_request ]
+permissions:
+  contents: read
+jobs:
+  golangci:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Lint backend
+        uses: golangci/golangci-lint-action@v3
+  test:
+    name: Test with coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Test
+        run: go install "github.com/rakyll/gotest@latest" && gotest -v -coverprofile=coverage.out -covermode=atomic ./...
+  build:
+    name: Build Talebook
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --snapshot
