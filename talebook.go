@@ -7,6 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/bookstairs/talebook/config"
 )
 
 // This file only used for storing the command line arguments.
@@ -28,10 +30,14 @@ var (
 
 	// The cobra command for executing server.
 	rootCmd = &cobra.Command{
-		Use:   "talebook",
-		Short: "This a fork of github.com/talebook/talebook. Serve as your personal library.",
+		Use: "talebook",
+		Short: "Talebook (in Golang)\n\n" +
+			"This a fork of github.com/talebook/talebook. Serve as your personal library.\n" +
+			config.TalebookVersion().String() +
+			"\n",
+		Version: config.TalebookVersion().String(),
 		Run: func(cmd *cobra.Command, args []string) {
-			c := DefaultSeverConfig()
+			c := config.DefaultSeverConfig()
 
 			// Load config from config file.
 			if _, err := os.Stat(configFile); err == nil {
@@ -48,7 +54,7 @@ var (
 			}
 
 			// Override configuration from flags.
-			dc := DefaultSeverConfig()
+			dc := config.DefaultSeverConfig()
 			if port != dc.Port {
 				c.Port = port
 			}
@@ -82,7 +88,7 @@ var (
 
 func init() {
 	// Create a default configuration with config value.
-	c := DefaultSeverConfig()
+	c := config.DefaultSeverConfig()
 	configFile = filepath.Join(c.WorkingPath, defaultConfigFile)
 
 	// Register the talebook configuration file.
@@ -97,6 +103,10 @@ func init() {
 	rootCmd.Flags().StringVarP(&calibreDB, "calibredb", "", c.CalibreDB, "The full path for calibredb(.exe).")
 	rootCmd.Flags().StringVarP(&convert, "convert", "", c.Convert, "The full path for ebook-convert(.exe).")
 	rootCmd.Flags().BoolVarP(&debug, "debug", "d", c.Debug, "Enable some functions for debug purpose. This shouldn't be enable in production.")
+
+	// Add version flag.
+	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)
+	rootCmd.InitDefaultVersionFlag()
 }
 
 func main() {

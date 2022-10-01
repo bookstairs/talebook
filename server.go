@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"time"
 
@@ -18,45 +17,12 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 
 	"github.com/bookstairs/talebook/calibre"
+	"github.com/bookstairs/talebook/config"
 	"github.com/bookstairs/talebook/handlers"
 )
 
-type ServerConfig struct {
-	Port        int    `yaml:"port"`        // The binding port for backend server.
-	WorkingPath string `yaml:"workingPath"` // The working directory for talebook.
-	LibraryPath string `yaml:"libraryPath"` // The calibre library directory.
-	EncryptKey  string `yaml:"encryptKey"`  // This is used to encrypt the cookie.
-	Limit       int    `yaml:"limit"`       // Allowed request per seconds.
-	CalibreDB   string `yaml:"calibreDB"`   // The executable file calibredb for adding books.
-	Convert     string `yaml:"convert"`     // The executable file ebook-convert for converting books.
-	Debug       bool   `yaml:"debug"`       // Enable debug log and metrics monitor and anything else.
-}
-
-func (c *ServerConfig) GetPath(paths ...string) string {
-	return filepath.Join(c.WorkingPath, filepath.Join(paths...))
-}
-
-func DefaultSeverConfig() *ServerConfig {
-	// Init the config variables with some default values.
-	w, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return &ServerConfig{
-		Port:        8000,
-		WorkingPath: w,
-		LibraryPath: filepath.Join(w, "library"),
-		EncryptKey:  "this-is-an-encrypt-key",
-		Limit:       100,
-		CalibreDB:   calibre.DefaultCalibreDB,
-		Convert:     calibre.DefaultConvert,
-		Debug:       false,
-	}
-}
-
 // StartServer will start the talebook server.
-func StartServer(c *ServerConfig) {
+func StartServer(c *config.ServerConfig) {
 	// Create working directories.
 	createWorkingPaths(c)
 
@@ -122,7 +88,7 @@ func StartServer(c *ServerConfig) {
 }
 
 // createWorkingPaths will create all the required working directory.
-func createWorkingPaths(c *ServerConfig) {
+func createWorkingPaths(c *config.ServerConfig) {
 	// Internal method for making all the directories if it's not existed.
 	createPath := func(path string) {
 		if err := os.MkdirAll(path, os.ModePerm); err != nil {
@@ -142,6 +108,16 @@ func createWorkingPaths(c *ServerConfig) {
 	// Create all the working directories if they are not existed.
 	createPath(c.GetPath("statics"))
 	createPath(c.LibraryPath)
+
+	// Check the calibredb
+	if !fileExist(c.CalibreDB) {
+		log.Fatal("No calibredb could be found on path:", c.CalibreDB, "check or provide a new path through cmd line.")
+	}
+
+	// Check the ebook-convert
+	if !fileExist(c.Convert) {
+		log.Fatal("No ebook-convert could be found on path:", c.Convert, "check or provide a new path through cmd line.")
+	}
 
 	// Extract the default calibre library in case of failure.
 	if !fileExist(calibre.GetDatabase(c.LibraryPath)) {

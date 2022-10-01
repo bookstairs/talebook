@@ -31,6 +31,10 @@ type Version struct {
 	Platform     string `json:"platform"`
 }
 
+func (v *Version) String() string {
+	return fmt.Sprintf("Version: %s.%s, Build Date: %s, Git Commit: %s", v.Major, v.Minor, v.BuildDate, v.GitCommit)
+}
+
 // TalebookVersion will return and print the current project version.
 // These properties are provided by goreleaser.
 func TalebookVersion() *Version {
