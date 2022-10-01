@@ -32,7 +32,7 @@ type Version struct {
 }
 
 func (v *Version) String() string {
-	return fmt.Sprintf("Version: %s.%s, Build Date: %s, Git Commit: %s", v.Major, v.Minor, v.BuildDate, v.GitCommit)
+	return fmt.Sprintf("Version: %s.%s, Build Date: %s\nGit Commit: %s", v.Major, v.Minor, v.BuildDate, v.GitCommit)
 }
 
 // TalebookVersion will return and print the current project version.

@@ -4,19 +4,19 @@
 port: 8000
 
 # The working directory for talebook.
-workingPath: "."
+working-path: "."
 
 # The calibre library directory.
-libraryPath: "./library"
+library-path: "./library"
 
 # This is used to encrypt the cookie.
-encryptKey: "some-key"
+encrypt-key: "some-key"
 
 # Allowed request per seconds.
 limit: 300
 
 # The executable file calibredb for adding books.
-calibreDB: "/usr/bin/calibredb"
+calibredb: "/usr/bin/calibredb"
 
 # The executable file ebook-convert for converting books.
 convert: "/usr/bin/ebook-convert"
