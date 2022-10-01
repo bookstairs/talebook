@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/bookstairs/talebook/config"
-	"github.com/bookstairs/talebook/handlers"
+	"github.com/bookstairs/talebook/handler"
 )
 
 const (
@@ -78,7 +78,7 @@ func NewRootCommand() *cobra.Command {
 			initRuntime(c)
 
 			// Bootstrap the talebook server.
-			handlers.StartServer(c)
+			handler.StartServer(c)
 		},
 	}
 

@@ -56,7 +56,6 @@ Golang and Node.js are required for developing. Remember to install them.
 - [ ] `/get/progress/([0-9]+)`
 - [ ] `/get/extract/(.*)`
 - [ ] `/get/(.*)/(.*)`
-- [ ] `/(.*)`
 
 ### Admin API
 
