@@ -133,9 +133,10 @@ func createWorkingPaths(c *ServerConfig) {
 	fileExist := func(path string) bool {
 		_, err := os.Stat(path)
 		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			// We can't access this file because it's unreachable.
 			log.Fatal(err)
 		}
-		return err != nil
+		return err == nil
 	}
 
 	// Create all the working directories if they are not existed.
@@ -144,6 +145,7 @@ func createWorkingPaths(c *ServerConfig) {
 
 	// Extract the default calibre library in case of failure.
 	if !fileExist(calibre.GetDatabase(c.LibraryPath)) {
+		log.Print("No calibre library found extract the default library.")
 		err := extractDefaultLibrary(c.LibraryPath)
 		if err != nil {
 			// Use log.Fatal may not execute the defer method.
