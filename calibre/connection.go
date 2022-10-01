@@ -8,6 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	// The calibre database path.
+	currentPath string
+	// We will hold this instance for caching the connection pool.
+	db *gorm.DB
+)
+
 // database is the file for storing the calibre data
 const database = "metadata.db"
 
@@ -16,13 +23,35 @@ func GetDatabase(librayPath string) string {
 	return filepath.Join(librayPath, database)
 }
 
-// Connect to calibre library database for querying.
-func Connect(libraryPath string) *gorm.DB {
-	dbPath := GetDatabase(libraryPath)
-	db, err := gorm.Open(sqlite.Open(dbPath))
-	if err != nil {
-		log.Fatalln(err)
+// DB will return a calibre connection pool.
+func DB() *gorm.DB {
+	if db == nil {
+		log.Fatalln("Wrong calibre initialization")
 	}
 
 	return db
+}
+
+func Reconnect(libraryPath string) error {
+	dbPath := GetDatabase(libraryPath)
+	if dbPath == currentPath {
+		// No need to reconnect the calibre.
+		return nil
+	} else {
+		currentPath = dbPath
+	}
+
+	// Close old connection.
+	connect, err := db.DB()
+	if err != nil {
+		return err
+	}
+	err = connect.Close()
+	if err != nil {
+		return err
+	}
+
+	// Create new connection.
+	db, err = gorm.Open(sqlite.Open(currentPath))
+	return err
 }

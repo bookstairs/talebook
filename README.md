@@ -13,7 +13,7 @@ Golang and Node.js are required for developing. Remember to install them.
 
 ## Talebook API implementation status
 
-### Books API
+### Book API
 
 - [ ] `/api/index`
 - [ ] `/api/search`
@@ -29,7 +29,7 @@ Golang and Node.js are required for developing. Remember to install them.
 - [ ] `/api/book/([0-9]+)/refer`
 - [ ] `/read/([0-9]+)`
 
-### Users API
+### User API
 
 - [ ] `/api/welcome`
 - [ ] `/api/user/info`
@@ -50,7 +50,7 @@ Golang and Node.js are required for developing. Remember to install them.
 - [ ] `/api/author/(.*)/update`
 - [ ] `/api/publisher/(.*)/update`
 
-### Files API
+### File API
 
 - [ ] `/get/pcover`
 - [ ] `/get/progress/([0-9]+)`
@@ -58,7 +58,7 @@ Golang and Node.js are required for developing. Remember to install them.
 - [ ] `/get/(.*)/(.*)`
 - [ ] `/(.*)`
 
-### ADMIN API
+### Admin API
 
 - [ ] `/api/admin/ssl`
 - [ ] `/api/admin/users`
