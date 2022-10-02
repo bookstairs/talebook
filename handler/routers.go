@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bookstairs/talebook/handler/book"
+	"github.com/bookstairs/talebook/handler/user"
 )
 
 func registerHandlers(app *fiber.App) {
@@ -67,7 +68,6 @@ func registerHandlers(app *fiber.App) {
 	// Use Handlers Checklist
 	//
 	// /api/welcome
-	// /api/user/info
 	// /api/user/messages
 	// /api/user/sign_in
 	// /api/user/sign_up
@@ -77,4 +77,5 @@ func registerHandlers(app *fiber.App) {
 	// /api/user/active/send
 	// /api/active/(.*)/(.*)
 	// /api/done/
+	app.Get("/api/user/info", user.Info)
 }

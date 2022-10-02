@@ -14,7 +14,7 @@ builds:
       - -s -w
       - -X github.com/bookstairs/talebook/config.gitMajor={{ .Major }}
       - -X github.com/bookstairs/talebook/config.gitMinor={{ .Minor }}
-      - -X github.com/bookstairs/talebook/config.gitVersion={{ .Version }}
+      - -X github.com/bookstairs/talebook/config.gitPatch={{ .Patch }}
       - -X github.com/bookstairs/talebook/config.gitCommit={{ .Commit }}
       - -X github.com/bookstairs/talebook/config.gitTreeState=clean
       - -X github.com/bookstairs/talebook/config.buildDate={{ .Date }}

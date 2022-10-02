@@ -9,6 +9,7 @@ import (
 
 const maxBookQuery = 30
 
+// Index would serve /api/search
 func Index(ctx *fiber.Ctx) error {
 	random, err := common.GetQueryInt(ctx, "random", 8, maxBookQuery)
 	if err != nil {
