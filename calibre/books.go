@@ -40,12 +40,12 @@ FROM books b
          LEFT JOIN books_languages_link bll ON b.id = bll.book
          LEFT JOIN languages l ON bll.lang_code = l.id`
 
-	authorQueryTmpl = `SELECT bal.book AS book_id, a.name AS author
+	bookAuthorQueryTmpl = `SELECT bal.book AS book_id, a.name AS author
 FROM books_authors_link bal
          LEFT JOIN authors a ON bal.author = a.id
 WHERE bal.book IN (%s);`
 
-	tagQueryTmpl = `SELECT btl.book AS book_id, t.name AS tag
+	bookTagQueryTmpl = `SELECT btl.book AS book_id, t.name AS tag
 FROM books_tags_link btl
          LEFT JOIN tags t ON btl.tag = t.id
 WHERE btl.book IN (%s);`
@@ -58,6 +58,18 @@ func QueryRandomBookIDs(ctx context.Context, size int) (ids []string, err error)
 		Args: []any{size},
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			ids = append(ids, stmt.GetText("id"))
+			return nil
+		},
+	})
+
+	return
+}
+
+// QueryBookCount will return the size of books.
+func QueryBookCount(ctx context.Context) (result int64, err error) {
+	err = Execute(ctx, "SELECT COUNT(1) AS counts FROM books;", &sqlitex.ExecOptions{
+		ResultFunc: func(stmt *sqlite.Stmt) error {
+			result = stmt.GetInt64("counts")
 			return nil
 		},
 	})
@@ -141,7 +153,7 @@ func bookMetadataQuery(ctx context.Context, books []model.Book) ([]model.Book, e
 	idStr := strings.Join(ids, ", ")
 
 	// Query authors.
-	authorQuery := fmt.Sprintf(authorQueryTmpl, idStr)
+	authorQuery := fmt.Sprintf(bookAuthorQueryTmpl, idStr)
 	err := Execute(ctx, authorQuery, &sqlitex.ExecOptions{
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			id := stmt.GetText("book_id")
@@ -154,7 +166,7 @@ func bookMetadataQuery(ctx context.Context, books []model.Book) ([]model.Book, e
 	}
 
 	// Query tags.
-	tagQuery := fmt.Sprintf(tagQueryTmpl, idStr)
+	tagQuery := fmt.Sprintf(bookTagQueryTmpl, idStr)
 	err = Execute(ctx, tagQuery, &sqlitex.ExecOptions{
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			id := stmt.GetText("book_id")

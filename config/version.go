@@ -31,8 +31,14 @@ type Version struct {
 	Platform     string `json:"platform"`
 }
 
+// String use to display the version information in command line.
 func (v *Version) String() string {
 	return fmt.Sprintf("Version: %s.%s, Build Date: %s\nGit Commit: %s", v.Major, v.Minor, v.BuildDate, v.GitCommit)
+}
+
+// SemanticString use to display in API response.
+func (v *Version) SemanticString() string {
+	return v.Major + "." + v.Minor
 }
 
 // TalebookVersion will return and print the current project version.
