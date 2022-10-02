@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 )
 
+const DefaultCoverPath = "/cover/default.jpg"
+
 // ServerConfig is used to start the fiber server.
 type ServerConfig struct {
 	Port        int      // The binding port for backend server.
@@ -16,7 +18,7 @@ type ServerConfig struct {
 	Limit       int      // Allowed request per seconds.
 	CalibreDB   string   // The executable file calibredb for adding books.
 	Convert     string   // The executable file ebook-convert for converting books.
-	FileCache   int      // The cache in memory for storing frequently accessed files, such as the book cover.
+	CoverCache  int      // The cache in memory for storing frequently accessed files, such as the book cover.
 	Debug       bool     // Enable debug log and metrics monitor and anything else.
 	Frontend    embed.FS // The embed static files.
 }
@@ -41,7 +43,7 @@ func DefaultSeverConfig() *ServerConfig {
 		Limit:       100,
 		CalibreDB:   defaultCalibreDB,
 		Convert:     defaultConvert,
-		FileCache:   0,
+		CoverCache:  0,
 		Debug:       false,
 	}
 }

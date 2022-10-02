@@ -3,6 +3,7 @@ package calibre
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -10,6 +11,7 @@ import (
 	"zombiezen.com/go/sqlite"
 	"zombiezen.com/go/sqlite/sqlitex"
 
+	"github.com/bookstairs/talebook/config"
 	"github.com/bookstairs/talebook/model"
 )
 
@@ -24,6 +26,7 @@ const (
        b.timestamp,
        b.pubdate,
        b.author_sort,
+       b.has_cover,
        p.name      as publisher,
        c.text      as comments,
        s.name      as series,
@@ -133,9 +136,9 @@ func QueryBooks(ctx context.Context, index, size int) (books []model.Book, err e
 }
 
 // QueryBookFormats will query the formats for the bookFormatsQueryImpl.
-func QueryBookFormats(ctx context.Context, bookID int64) (result []model.BookFormat, err error) {
+func QueryBookFormats(ctx context.Context, id int64) (result []model.BookFormat, err error) {
 	// Query book formats.
-	formatsQuery := fmt.Sprintf(bookFormatsQueryImpl, strconv.FormatInt(bookID, 10))
+	formatsQuery := fmt.Sprintf(bookFormatsQueryImpl, strconv.FormatInt(id, 10))
 	err = Execute(ctx, formatsQuery, &sqlitex.ExecOptions{
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			result = append(result, model.BookFormat{
@@ -151,8 +154,37 @@ func QueryBookFormats(ctx context.Context, bookID int64) (result []model.BookFor
 	return
 }
 
+// QueryBookCover we will return "" if there is no cover for the query book.
+func QueryBookCover(ctx context.Context, id int64) (cover string, err error) {
+	bookDir := ""
+	err = Execute(ctx, "SELECT has_cover, path FROM books WHERE id = ?;", &sqlitex.ExecOptions{
+		Args: []any{id},
+		ResultFunc: func(stmt *sqlite.Stmt) error {
+			if stmt.GetBool("has_cover") {
+				bookDir = stmt.GetText("path")
+			}
+			return nil
+		},
+	})
+
+	if bookDir != "" {
+		bookDir = currentPath + "/" + bookDir + "/cover.jpg"
+		// For windows compatible, we have to change the path delimiter.
+		bookDir = strings.ReplaceAll(bookDir, "/", string(os.PathSeparator))
+	}
+	cover = bookDir
+
+	return
+}
+
 // convertBookDetailQuery will convert the bookDetailQueryTmpl into a book model.
 func convertBookDetailQuery(stmt *sqlite.Stmt) model.Book {
+	// Set default no cover image.
+	cover := ""
+	if !stmt.GetBool("has_cover") {
+		cover = config.DefaultCoverPath
+	}
+
 	return model.Book{
 		ID:         stmt.GetInt64("id"),
 		Title:      stmt.GetText("title"),
@@ -165,6 +197,8 @@ func convertBookDetailQuery(stmt *sqlite.Stmt) model.Book {
 		Series:     stmt.GetText("series"),
 		Language:   stmt.GetText("language"),
 		Isbn:       stmt.GetText("isbn"),
+		Img:        cover,
+		Thumb:      cover,
 	}
 }
 
@@ -215,8 +249,12 @@ func bookMetadataQuery(ctx context.Context, books []model.Book) ([]model.Book, e
 
 		books[i].Author = strings.Join(books[i].Authors, " / ")
 		books[i].Tag = strings.Join(books[i].Tags, ", ")
-		books[i].Img = "/get/cover/" + id + ".jpg?t=" + ts
-		books[i].Thumb = "/get/thumb_60x80/" + id + ".jpg?t=" + ts
+
+		if books[i].Img == "" {
+			books[i].Img = "/get/cover/" + id + ".jpg?t=" + ts
+			books[i].Thumb = "/get/thumb_60x80/" + id + ".jpg?t=" + ts
+		}
+
 		if len(books[i].Authors) > 0 {
 			books[i].AuthorURL = "/author/" + books[i].Authors[0]
 		}

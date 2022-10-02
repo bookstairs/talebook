@@ -48,7 +48,7 @@ func NewRootCommand() *cobra.Command {
 	limit := 0
 	calibreDB := ""
 	convert := ""
-	fileCache := 0
+	coverCache := 0
 	debug := false
 
 	// Create a default configuration with config value.
@@ -80,7 +80,7 @@ func NewRootCommand() *cobra.Command {
 				Limit:       limit,
 				CalibreDB:   calibreDB,
 				Convert:     convert,
-				FileCache:   fileCache,
+				CoverCache:  coverCache,
 				Debug:       debug,
 				Frontend:    frontend,
 			}
@@ -101,7 +101,7 @@ func NewRootCommand() *cobra.Command {
 	rootCmd.Flags().IntVarP(&limit, "ratelimit", "r", dc.Limit, "Add limit for the requests per second.")
 	rootCmd.Flags().StringVarP(&calibreDB, "calibredb", "", dc.CalibreDB, "The full path for calibredb(.exe).")
 	rootCmd.Flags().StringVarP(&convert, "convert", "", dc.Convert, "The full path for ebook-convert(.exe).")
-	rootCmd.Flags().IntVarP(&fileCache, "file-cache", "", dc.FileCache, "The file cache (MB) in memory.")
+	rootCmd.Flags().IntVarP(&coverCache, "cover-cache", "", dc.CoverCache, "The cover cache (MB) in memory.")
 	rootCmd.Flags().BoolVarP(&debug, "debug", "d", dc.Debug, "This shouldn't be enable in production.")
 
 	// Add version flag.

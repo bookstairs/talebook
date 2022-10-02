@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	// The calibre database path.
+	// The calibre library path.
 	currentPath string
 	// We will hold this instance for caching the connection pool.
 	pool *sqlitex.Pool
@@ -44,12 +44,11 @@ func ReturnDB(conn *sqlite.Conn) {
 
 // Reconnect will change the calibre connection to a new space.
 func Reconnect(libraryPath string) error {
-	dbPath := GetDatabase(libraryPath)
-	if dbPath == currentPath {
+	if libraryPath == currentPath {
 		// No need to reconnect the calibre.
 		return nil
 	} else {
-		currentPath = dbPath
+		currentPath = libraryPath
 	}
 
 	// Close old connection if exists.
@@ -60,7 +59,7 @@ func Reconnect(libraryPath string) error {
 	}
 
 	// Create new connection.
-	conn, err := sqlitex.Open(currentPath, sqlite.OpenReadOnly|sqlite.OpenSharedCache, poolSize)
+	conn, err := sqlitex.Open(GetDatabase(libraryPath), sqlite.OpenReadOnly|sqlite.OpenSharedCache, poolSize)
 	if err != nil {
 		return err
 	}

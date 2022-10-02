@@ -22,7 +22,7 @@ calibredb: "/usr/bin/calibredb"
 convert: "/usr/bin/ebook-convert"
 
 # The cache in memory for storing frequently accessed files, such as the book cover.
-file-cache: 300
+cover-cache: 300
 
 # Enable debug log and metrics monitor and anything else.
 debug: false

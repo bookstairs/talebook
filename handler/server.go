@@ -4,8 +4,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
@@ -24,6 +26,8 @@ func StartServer(c *config.ServerConfig) {
 		AppName:                 "Talebook",
 		Immutable:               true,
 		EnableTrustedProxyCheck: true,
+		JSONEncoder:             json.Marshal,
+		JSONDecoder:             json.Unmarshal,
 	})
 
 	// Add cache support. We will disable cache in debug mode for development purpose.
@@ -46,7 +50,8 @@ func StartServer(c *config.ServerConfig) {
 	// Add ratelimit for avoiding spiders and anything else like the book downloader.
 	app.Use(limiter.New(limiter.Config{
 		Next: func(c *fiber.Ctx) bool {
-			return c.IP() == "127.0.0.1"
+			// We only cache the API request.
+			return c.IP() == "127.0.0.1" || !strings.HasPrefix(c.OriginalURL(), "/api")
 		},
 		Max:        c.Limit * 30,
 		Expiration: 30 * time.Second,
@@ -63,6 +68,9 @@ func StartServer(c *config.ServerConfig) {
 
 	// Add API backend.
 	registerHandlers(app)
+
+	// Initialize all the API handlers.
+	initHandlers(c)
 
 	// Allow end user to add custom frontend files.
 	// This would override the default frontend files. Use it at your own risk.

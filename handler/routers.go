@@ -1,13 +1,17 @@
 package handler
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/bookstairs/talebook/config"
 	"github.com/bookstairs/talebook/handler/book"
 	"github.com/bookstairs/talebook/handler/file"
 	"github.com/bookstairs/talebook/handler/user"
 )
 
+// manually add the handlers here.
 func registerHandlers(app *fiber.App) {
 	// Admin Handlers Checklist
 	//
@@ -34,16 +38,11 @@ func registerHandlers(app *fiber.App) {
 	// /read/([0-9]+)
 	app.Get("/api/index", book.Index)
 
-	// File Handlers Checklist
-	//
-	// /get/pcover
-	// /get/progress/([0-9]+)
-	// /get/extract/(.*)
-	// /get/(.*)/(.*)
+	// File Handlers
 	app.Get("/get/pcover", file.ProxyCover)
 	app.Get("/get/progress/:bid<int>", file.Progress)
 	app.Get("/get/extract/:bid<int>", file.Extract)
-	app.Get("/get/:fmt/:bid<int>", file.Load)
+	app.Get("/get/:kind/:id<int>.jpg", file.ImageCover)
 
 	// Metadata Handlers Checklist
 	//
@@ -83,4 +82,11 @@ func registerHandlers(app *fiber.App) {
 	// /api/done/
 	app.Get("/api/user/info", user.Info)
 	app.Get("/api/user/messages", user.GetMessages)
+}
+
+// If you have some dynamically init logic, add it here.
+func initHandlers(c *config.ServerConfig) {
+	if err := file.InitCoverCache(c); err != nil {
+		log.Fatalln(err)
+	}
 }
