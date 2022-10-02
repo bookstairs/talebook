@@ -7,9 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"crawshaw.io/sqlite"
 	"github.com/golang-module/carbon/v2"
-	"zombiezen.com/go/sqlite"
-	"zombiezen.com/go/sqlite/sqlitex"
 
 	"github.com/bookstairs/talebook/config"
 	"github.com/bookstairs/talebook/model"
@@ -68,7 +67,7 @@ WHERE b.id IN (%s);`
 // QueryRandomBookIDs will return random book ids from calibre.
 func QueryRandomBookIDs(ctx context.Context, size int) (ids []string, err error) {
 	ids = make([]string, 0, size)
-	err = Execute(ctx, "SELECT id FROM books ORDER BY RANDOM() LIMIT ?;", &sqlitex.ExecOptions{
+	err = Execute(ctx, "SELECT id FROM books ORDER BY RANDOM() LIMIT ?;", &ExecOptions{
 		Args: []any{size},
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			ids = append(ids, stmt.GetText("id"))
@@ -81,7 +80,7 @@ func QueryRandomBookIDs(ctx context.Context, size int) (ids []string, err error)
 
 // QueryBookCount will return the size of books.
 func QueryBookCount(ctx context.Context) (result int64, err error) {
-	err = Execute(ctx, "SELECT COUNT(1) AS counts FROM books;", &sqlitex.ExecOptions{
+	err = Execute(ctx, "SELECT COUNT(1) AS counts FROM books;", &ExecOptions{
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			result = stmt.GetInt64("counts")
 			return nil
@@ -99,7 +98,7 @@ func QueryBooksByIDs(ctx context.Context, ids []string) (books []model.Book, err
 
 	books = make([]model.Book, 0, len(ids))
 	query := bookDetailQueryTmpl + " WHERE b.id in (" + strings.Join(ids, ", ") + ");"
-	err = Execute(ctx, query, &sqlitex.ExecOptions{
+	err = Execute(ctx, query, &ExecOptions{
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			books = append(books, convertBookDetailQuery(stmt))
 			return nil
@@ -121,7 +120,7 @@ func QueryBooks(ctx context.Context, index, size int) (books []model.Book, err e
 
 	books = make([]model.Book, 0, size)
 	query := bookDetailQueryTmpl + ` ORDER BY b.id DESC LIMIT ? OFFSET ?;`
-	err = Execute(ctx, query, &sqlitex.ExecOptions{
+	err = Execute(ctx, query, &ExecOptions{
 		Args: []any{size, (index - 1) * size},
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			books = append(books, convertBookDetailQuery(stmt))
@@ -139,7 +138,7 @@ func QueryBooks(ctx context.Context, index, size int) (books []model.Book, err e
 func QueryBookFormats(ctx context.Context, id int64) (result []model.BookFormat, err error) {
 	// Query book formats.
 	formatsQuery := fmt.Sprintf(bookFormatsQueryImpl, strconv.FormatInt(id, 10))
-	err = Execute(ctx, formatsQuery, &sqlitex.ExecOptions{
+	err = Execute(ctx, formatsQuery, &ExecOptions{
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			result = append(result, model.BookFormat{
 				ID:     stmt.GetInt64("id"),
@@ -157,10 +156,10 @@ func QueryBookFormats(ctx context.Context, id int64) (result []model.BookFormat,
 // QueryBookCover we will return "" if there is no cover for the query book.
 func QueryBookCover(ctx context.Context, id int64) (cover string, err error) {
 	bookDir := ""
-	err = Execute(ctx, "SELECT has_cover, path FROM books WHERE id = ?;", &sqlitex.ExecOptions{
+	err = Execute(ctx, "SELECT has_cover, path FROM books WHERE id = ?;", &ExecOptions{
 		Args: []any{id},
 		ResultFunc: func(stmt *sqlite.Stmt) error {
-			if stmt.GetBool("has_cover") {
+			if stmt.GetInt64("has_cover") != 0 {
 				bookDir = stmt.GetText("path")
 			}
 			return nil
@@ -181,7 +180,7 @@ func QueryBookCover(ctx context.Context, id int64) (cover string, err error) {
 func convertBookDetailQuery(stmt *sqlite.Stmt) model.Book {
 	// Set default no cover image.
 	cover := ""
-	if !stmt.GetBool("has_cover") {
+	if stmt.GetInt64("has_cover") == 0 {
 		cover = config.DefaultCoverPath
 	}
 
@@ -218,7 +217,7 @@ func bookMetadataQuery(ctx context.Context, books []model.Book) ([]model.Book, e
 
 	// Query authors.
 	authorQuery := fmt.Sprintf(bookAuthorQueryTmpl, idStr)
-	err := Execute(ctx, authorQuery, &sqlitex.ExecOptions{
+	err := Execute(ctx, authorQuery, &ExecOptions{
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			id := stmt.GetText("book_id")
 			bookIdx[id].Authors = append(bookIdx[id].Authors, stmt.GetText("author"))
@@ -231,7 +230,7 @@ func bookMetadataQuery(ctx context.Context, books []model.Book) ([]model.Book, e
 
 	// Query tags.
 	tagQuery := fmt.Sprintf(bookTagQueryTmpl, idStr)
-	err = Execute(ctx, tagQuery, &sqlitex.ExecOptions{
+	err = Execute(ctx, tagQuery, &ExecOptions{
 		ResultFunc: func(stmt *sqlite.Stmt) error {
 			id := stmt.GetText("book_id")
 			bookIdx[id].Tags = append(bookIdx[id].Tags, stmt.GetText("tag"))

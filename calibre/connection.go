@@ -5,8 +5,8 @@ import (
 	"log"
 	"path/filepath"
 
-	"zombiezen.com/go/sqlite"
-	"zombiezen.com/go/sqlite/sqlitex"
+	"crawshaw.io/sqlite"
+	"crawshaw.io/sqlite/sqlitex"
 )
 
 var (
@@ -21,6 +21,11 @@ const database = "metadata.db"
 
 // poolSize used to cache the connection.
 const poolSize = 30
+
+type ExecOptions struct {
+	Args       []any
+	ResultFunc func(stmt *sqlite.Stmt) error
+}
 
 // GetDatabase will return the full path of calibre db.
 func GetDatabase(librayPath string) string {
@@ -59,7 +64,9 @@ func Reconnect(libraryPath string) error {
 	}
 
 	// Create new connection.
-	conn, err := sqlitex.Open(GetDatabase(libraryPath), sqlite.OpenReadOnly|sqlite.OpenSharedCache, poolSize)
+	db := GetDatabase(libraryPath)
+	flags := sqlite.SQLITE_OPEN_READONLY | sqlite.SQLITE_OPEN_SHAREDCACHE
+	conn, err := sqlitex.Open(db, flags, poolSize)
 	if err != nil {
 		return err
 	}
@@ -69,9 +76,9 @@ func Reconnect(libraryPath string) error {
 }
 
 // Execute will execute the sqlite query under the connection pool.
-func Execute(ctx context.Context, query string, opts *sqlitex.ExecOptions) error {
+func Execute(ctx context.Context, query string, opts *ExecOptions) error {
 	conn := BorrowDB(ctx)
 	defer ReturnDB(conn)
 
-	return sqlitex.Execute(conn, query, opts)
+	return sqlitex.Exec(conn, query, opts.ResultFunc, opts.Args...)
 }
