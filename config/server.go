@@ -31,6 +31,7 @@ func DefaultSeverConfig() *ServerConfig {
 	if err != nil {
 		log.Fatal(err)
 	}
+	w = filepath.Join(w, "repository")
 
 	return &ServerConfig{
 		Port:        8000,

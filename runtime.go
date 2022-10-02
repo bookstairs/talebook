@@ -29,7 +29,7 @@ func initRuntime(c *config.ServerConfig) {
 
 	// Create all the working directories if they are not existed.
 	createPath(c.GetPath("statics"))  // Frontend files.
-	createPath(c.GetPath("settings")) // The settings for talebook in sqlite3.
+	createPath(c.GetPath("settings")) // The settings for talebook in sqlite3 and bootstrap config file.
 	createPath(c.GetPath("converts")) // The temporary directory for storing the convert files.
 	createPath(c.GetPath("imports"))  // The directory for scanning and batch import books to your calibre library.
 	createPath(c.GetPath("uploads"))  // The temporary directory for storing the uploaded books.

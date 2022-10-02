@@ -57,3 +57,6 @@ web/yarn-error.log*
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Working directory. This is used mainly for development purpose.
+repository/*

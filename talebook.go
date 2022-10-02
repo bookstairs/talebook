@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -121,6 +122,8 @@ func initializeConfig(cmd *cobra.Command, dir string) error {
 	v.AddConfigPath(".")
 	if dir != "" {
 		v.AddConfigPath(dir)
+		// Put the configuration file here would be better.
+		v.AddConfigPath(filepath.Join(dir, "settings"))
 	}
 
 	// Attempt to read the config file, gracefully ignoring errors
