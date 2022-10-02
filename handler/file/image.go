@@ -67,27 +67,35 @@ func getCover(ctx *fiber.Ctx, id int64) error {
 		return ctx.Redirect(config.DefaultCoverPath, 302)
 	}
 
+	// Set file from cache.
 	if cache != nil {
 		image, err := cache.Get([]byte(cover))
 		if err == nil {
-			// Set response headers from cache
-			ctx.Response().SetBodyRaw(image)
-			ctx.Response().SetStatusCode(200)
-			ctx.Response().Header.SetContentType(coverContentType)
-			return nil
+			return sendFile(ctx, image, coverContentType)
 		}
 	}
 
-	// Manually serve images.
+	// Read file and save it into cache.
 	if cache != nil {
 		file, err := os.ReadFile(cover)
 		if err != nil {
 			return ctx.Redirect(config.DefaultCoverPath, 302)
 		}
 		_ = cache.Set([]byte(cover), file, defaultCoverExpireTime) // No need to care this error.
+
+		return sendFile(ctx, file, coverContentType)
 	}
 
+	// Manually serve images.
 	return ctx.SendFile(cover, false)
+}
+
+func sendFile(ctx *fiber.Ctx, file []byte, contextType string) error {
+	ctx.Response().SetBodyRaw(file)
+	ctx.Response().SetStatusCode(200)
+	ctx.Response().Header.SetContentType(contextType)
+
+	return nil
 }
 
 func getThumb(ctx *fiber.Ctx, kind string, id int64) error {
