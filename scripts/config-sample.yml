@@ -21,5 +21,8 @@ calibredb: "/usr/bin/calibredb"
 # The executable file ebook-convert for converting books.
 convert: "/usr/bin/ebook-convert"
 
+# The cache in memory for storing frequently accessed files, such as the book cover.
+file-cache: 300
+
 # Enable debug log and metrics monitor and anything else.
 debug: false
