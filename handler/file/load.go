@@ -4,6 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func load(ctx *fiber.Ctx) error {
+func Load(ctx *fiber.Ctx) error {
 	return nil
 }

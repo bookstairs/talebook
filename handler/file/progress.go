@@ -1,29 +1,31 @@
 package file
 
 import (
-	"github.com/bookstairs/talebook/calibre"
-	"github.com/gofiber/fiber/v2"
+	"fmt"
 	"os"
-	"strconv"
+
+	"github.com/gofiber/fiber/v2"
+
+	"github.com/bookstairs/talebook/calibre"
+	"github.com/bookstairs/talebook/handler/common"
 )
 
-func progress(ctx *fiber.Ctx) error {
-	bookID, _ := strconv.ParseInt(ctx.Params("bid"), 10, 0)
-
-	bookFormats, err := calibre.BookFormatsQuery(ctx.UserContext(), bookID)
+func Progress(ctx *fiber.Ctx) error {
+	id, _ := common.GetParamInt(ctx, "bid") // This must be an int value.
+	formats, err := calibre.QueryBookFormats(ctx.UserContext(), id)
 	if err != nil {
-		return ctx.JSON(map[string]string{"err": "exception", "msg": err.Error()})
+		return common.ErrResp(ctx, err)
 	}
-	for _, b := range bookFormats {
-		if b.Format == "EPUB" {
 
-			_, err := os.Stat(b.Path)
-			if err != nil {
-				return ctx.Status(404).JSON(map[string]string{"err": "exception", "msg": err.Error()})
+	for _, b := range formats {
+		if b.Format == "EPUB" {
+			if _, err := os.Stat(b.Path); err != nil {
+				return common.NotFound(ctx, err)
 			}
-			// TODO unzip epub
 			return ctx.SendFile(b.Path)
 		}
 	}
-	return ctx.JSON(map[string]string{"err": "exception", "msg": "not found epub file"})
+
+	// TODO Support the PDF file by the same time.
+	return common.ErrResp(ctx, fmt.Errorf("couldn't found the epub file"))
 }

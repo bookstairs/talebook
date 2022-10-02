@@ -40,17 +40,26 @@ FROM books b
          LEFT JOIN books_languages_link bll ON b.id = bll.book
          LEFT JOIN languages l ON bll.lang_code = l.id`
 
+	// Query all the authors for given books.
 	bookAuthorQueryTmpl = `SELECT bal.book AS book_id, a.name AS author
 FROM books_authors_link bal
          LEFT JOIN authors a ON bal.author = a.id
 WHERE bal.book IN (%s);`
 
+	// Query all the tags for given books.
 	bookTagQueryTmpl = `SELECT btl.book AS book_id, t.name AS tag
 FROM books_tags_link btl
          LEFT JOIN tags t ON btl.tag = t.id
 WHERE btl.book IN (%s);`
 
-	bookFormatsQueryImpl = `SELECT b.id as id, b.title as title, b.path ||'/'|| d.name || '.'|| lower(d.format) as path, d.format as format FROM books b LEFT JOIN data d ON b.id = d.book where b.id = %s`
+	// Query all the formats for the given books.
+	bookFormatsQueryImpl = `SELECT b.id AS id,
+       b.title AS title,
+       b.path || '/' || d.name || '.' || LOWER(d.format) AS path,
+       d.format AS format
+FROM books b
+         LEFT JOIN data d ON b.id = d.book
+WHERE b.id IN (%s);`
 )
 
 // QueryRandomBookIDs will return random book ids from calibre.
@@ -119,6 +128,25 @@ func QueryBooks(ctx context.Context, index, size int) (books []model.Book, err e
 	if err == nil {
 		books, err = bookMetadataQuery(ctx, books)
 	}
+
+	return
+}
+
+// QueryBookFormats will query the formats for the bookFormatsQueryImpl.
+func QueryBookFormats(ctx context.Context, bookID int64) (result []model.BookFormat, err error) {
+	// Query book formats.
+	formatsQuery := fmt.Sprintf(bookFormatsQueryImpl, strconv.FormatInt(bookID, 10))
+	err = Execute(ctx, formatsQuery, &sqlitex.ExecOptions{
+		ResultFunc: func(stmt *sqlite.Stmt) error {
+			result = append(result, model.BookFormat{
+				ID:     stmt.GetInt64("id"),
+				Title:  stmt.GetText("title"),
+				Format: stmt.GetText("format"),
+				Path:   stmt.GetText("path"),
+			})
+			return nil
+		},
+	})
 
 	return
 }
@@ -200,23 +228,4 @@ func bookMetadataQuery(ctx context.Context, books []model.Book) ([]model.Book, e
 	}
 
 	return books, nil
-}
-
-// BookFormatsQuery will query the formats for the bookFormatsQueryImpl.
-func BookFormatsQuery(ctx context.Context, bookID int64) ([]model.BookFormat, error) {
-	bookFormats := make([]model.BookFormat, 0)
-	// Query formats.
-	formatsQuery := fmt.Sprintf(bookFormatsQueryImpl, bookID)
-	err := Execute(ctx, formatsQuery, &sqlitex.ExecOptions{
-		ResultFunc: func(stmt *sqlite.Stmt) error {
-			bookFormats = append(bookFormats, model.BookFormat{
-				ID:     stmt.GetInt64("id"),
-				Title:  stmt.GetText("title"),
-				Format: stmt.GetText("format"),
-				Path:   stmt.GetText("path"),
-			})
-			return nil
-		},
-	})
-	return bookFormats, err
 }

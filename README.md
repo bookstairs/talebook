@@ -52,7 +52,7 @@ Golang and Node.js are required for developing. Remember to install them.
 
 ### File API
 
-- [ ] `/get/cover`
+- [ ] `/get/pcover`
 - [ ] `/get/progress/([0-9]+)`
 - [ ] `/get/extract/(.*)`
 - [ ] `/get/(.*)/(.*)`

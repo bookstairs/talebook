@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/bookstairs/talebook/handler/book"
+	"github.com/bookstairs/talebook/handler/file"
 	"github.com/bookstairs/talebook/handler/user"
 )
 
@@ -39,6 +40,10 @@ func registerHandlers(app *fiber.App) {
 	// /get/progress/([0-9]+)
 	// /get/extract/(.*)
 	// /get/(.*)/(.*)
+	app.Get("/get/pcover", file.ProxyCover)
+	app.Get("/get/progress/:bid<int>", file.Progress)
+	app.Get("/get/extract/:bid<int>", file.Extract)
+	app.Get("/get/:fmt/:bid<int>", file.Load)
 
 	// Metadata Handlers Checklist
 	//

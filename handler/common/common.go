@@ -32,6 +32,10 @@ func ErrResp(ctx *fiber.Ctx, err error) error {
 	return ctx.JSON(map[string]any{"err": "exception", "msg": err})
 }
 
+func NotFound(ctx *fiber.Ctx, err error) error {
+	return ctx.Status(404).JSON(map[string]any{"err": "exception", "msg": err})
+}
+
 func GetQueryInt(ctx *fiber.Ctx, name string, dv, max int) (int, error) {
 	query := ctx.Query(name, "")
 	if query == "" {
@@ -47,4 +51,13 @@ func GetQueryInt(ctx *fiber.Ctx, name string, dv, max int) (int, error) {
 	} else {
 		return max, nil
 	}
+}
+
+func GetQueryString(ctx *fiber.Ctx, name, defVal string) string {
+	return ctx.Query(name, defVal)
+}
+
+func GetParamInt(ctx *fiber.Ctx, name string) (int64, error) {
+	param := ctx.Params(name)
+	return strconv.ParseInt(param, 10, 0)
 }

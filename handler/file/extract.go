@@ -4,6 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func extract(ctx *fiber.Ctx) error {
+func Extract(ctx *fiber.Ctx) error {
 	return nil
 }
