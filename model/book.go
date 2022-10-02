@@ -24,3 +24,10 @@ type Book struct {
 	AuthorURL     string   `json:"author_url"`
 	PublisherURL  string   `json:"publisher_url"`
 }
+
+type BookFormat struct {
+	ID     int64  `json:"id"`
+	Title  string `json:"title"`
+	Format string `json:"format"`
+	Path   string `json:"path"`
+}
