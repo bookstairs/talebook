@@ -68,7 +68,6 @@ func registerHandlers(app *fiber.App) {
 	// Use Handlers Checklist
 	//
 	// /api/welcome
-	// /api/user/messages
 	// /api/user/sign_in
 	// /api/user/sign_up
 	// /api/user/sign_out
@@ -78,4 +77,5 @@ func registerHandlers(app *fiber.App) {
 	// /api/active/(.*)/(.*)
 	// /api/done/
 	app.Get("/api/user/info", user.Info)
+	app.Get("/api/user/messages", user.GetMessages)
 }
