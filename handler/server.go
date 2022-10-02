@@ -15,6 +15,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 
 	"github.com/bookstairs/talebook/config"
+	"github.com/bookstairs/talebook/handler/admin"
+	"github.com/bookstairs/talebook/handler/book"
+	"github.com/bookstairs/talebook/handler/file"
+	"github.com/bookstairs/talebook/handler/metadata"
+	"github.com/bookstairs/talebook/handler/opds"
+	"github.com/bookstairs/talebook/handler/scan"
+	"github.com/bookstairs/talebook/handler/user"
 )
 
 // StartServer will start the talebook server.
@@ -26,14 +33,16 @@ func StartServer(c *config.ServerConfig) {
 		EnableTrustedProxyCheck: true,
 	})
 
-	// Add cache support.
-	app.Use(cache.New(cache.Config{
-		Next: func(c *fiber.Ctx) bool {
-			return c.Query("refresh") == "true"
-		},
-		Expiration:   30 * time.Minute,
-		CacheControl: true,
-	}))
+	// Add cache support. We will disable cache in debug mode for development purpose.
+	if !c.Debug {
+		app.Use(cache.New(cache.Config{
+			Next: func(c *fiber.Ctx) bool {
+				return c.Query("refresh") == "true"
+			},
+			Expiration:   30 * time.Minute,
+			CacheControl: true,
+		}))
+	}
 
 	// Encrypt the cookie for end user.
 	app.Use(encryptcookie.New(encryptcookie.Config{Key: c.EncryptKey}))
@@ -78,4 +87,15 @@ func StartServer(c *config.ServerConfig) {
 
 	// Listen on given port.
 	log.Fatal(app.Listen(":" + strconv.Itoa(c.Port)))
+}
+
+// registerHandlers will add the handlers to fiber.
+func registerHandlers(app *fiber.App) {
+	admin.Handlers(app)
+	book.Handlers(app)
+	file.Handlers(app)
+	metadata.Handlers(app)
+	opds.Handlers(app)
+	scan.Handlers(app)
+	user.Handlers(app)
 }

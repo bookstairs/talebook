@@ -15,7 +15,7 @@ Golang and Node.js are required for developing. Remember to install them.
 
 ### Book API
 
-- [ ] `/api/index`
+- [x] `/api/index`
 - [ ] `/api/search`
 - [ ] `/api/recent`
 - [ ] `/api/hot`

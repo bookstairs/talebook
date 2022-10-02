@@ -34,11 +34,15 @@ func DefaultSeverConfig() *ServerConfig {
 	return &ServerConfig{
 		Port:        8000,
 		WorkingPath: w,
-		LibraryPath: filepath.Join(w, "library"),
+		LibraryPath: DefaultLibraryPath(w),
 		EncryptKey:  "this-is-an-encrypt-key",
 		Limit:       100,
 		CalibreDB:   defaultCalibreDB,
 		Convert:     defaultConvert,
 		Debug:       false,
 	}
+}
+
+func DefaultLibraryPath(workingPath string) string {
+	return filepath.Join(workingPath, "library")
 }

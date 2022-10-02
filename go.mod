@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/gofiber/fiber/v2 v2.38.1
+	github.com/golang-module/carbon/v2 v2.1.9
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.13.0

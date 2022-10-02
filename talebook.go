@@ -49,6 +49,9 @@ func NewRootCommand() *cobra.Command {
 	convert := ""
 	debug := false
 
+	// Create a default configuration with config value.
+	dc := config.DefaultSeverConfig()
+
 	// The cobra command for executing server.
 	rootCmd := &cobra.Command{
 		Use: "talebook",
@@ -62,6 +65,11 @@ func NewRootCommand() *cobra.Command {
 			return initializeConfig(cmd, workingPath)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
+			// Make sure we use the proper library path.
+			if libraryPath == dc.LibraryPath && workingPath != dc.WorkingPath {
+				libraryPath = config.DefaultLibraryPath(workingPath)
+			}
+
 			c := &config.ServerConfig{
 				Port:        port,
 				WorkingPath: workingPath,
@@ -82,18 +90,15 @@ func NewRootCommand() *cobra.Command {
 		},
 	}
 
-	// Create a default configuration with config value.
-	c := config.DefaultSeverConfig()
-
 	// Register the talebook configuration flags. These would override the configurations in file.
-	rootCmd.Flags().IntVarP(&port, "port", "p", c.Port, "The http port for talebook.")
-	rootCmd.Flags().StringVarP(&workingPath, "working-path", "w", c.WorkingPath, "The working directory for talebook.")
-	rootCmd.Flags().StringVarP(&libraryPath, "library-path", "l", c.LibraryPath, "The calibre library directory.")
-	rootCmd.Flags().StringVarP(&encryptKey, "encrypt-key", "e", c.EncryptKey, "The key for encrypting the cookie content.")
-	rootCmd.Flags().IntVarP(&limit, "ratelimit", "r", c.Limit, "Add limit for the requests per second.")
-	rootCmd.Flags().StringVarP(&calibreDB, "calibredb", "", c.CalibreDB, "The full path for calibredb(.exe).")
-	rootCmd.Flags().StringVarP(&convert, "convert", "", c.Convert, "The full path for ebook-convert(.exe).")
-	rootCmd.Flags().BoolVarP(&debug, "debug", "d", c.Debug, "Enable some functions for debug purpose. This shouldn't be enable in production.")
+	rootCmd.Flags().IntVarP(&port, "port", "p", dc.Port, "The http port for talebook.")
+	rootCmd.Flags().StringVarP(&workingPath, "working-path", "w", dc.WorkingPath, "The working directory for talebook.")
+	rootCmd.Flags().StringVarP(&libraryPath, "library-path", "l", dc.LibraryPath, "The calibre library directory.")
+	rootCmd.Flags().StringVarP(&encryptKey, "encrypt-key", "e", dc.EncryptKey, "The key for encrypting the cookie content.")
+	rootCmd.Flags().IntVarP(&limit, "ratelimit", "r", dc.Limit, "Add limit for the requests per second.")
+	rootCmd.Flags().StringVarP(&calibreDB, "calibredb", "", dc.CalibreDB, "The full path for calibredb(.exe).")
+	rootCmd.Flags().StringVarP(&convert, "convert", "", dc.Convert, "The full path for ebook-convert(.exe).")
+	rootCmd.Flags().BoolVarP(&debug, "debug", "d", dc.Debug, "This shouldn't be enable in production.")
 
 	// Add version flag.
 	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)
