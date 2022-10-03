@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"io/fs"
 	"log"
 	"net/http"
 	"strconv"
@@ -31,15 +32,13 @@ func StartServer(c *config.ServerConfig) {
 	})
 
 	// Add cache support. We will disable cache in debug mode for development purpose.
-	if !c.Debug {
-		app.Use(cache.New(cache.Config{
-			Next: func(c *fiber.Ctx) bool {
-				return c.Query("refresh") == "true"
-			},
-			Expiration:   30 * time.Minute,
-			CacheControl: true,
-		}))
-	}
+	app.Use(cache.New(cache.Config{
+		Next: func(c *fiber.Ctx) bool {
+			return c.Query("refresh") == "true" || c.IP() == "127.0.0.1"
+		},
+		Expiration:   30 * time.Minute,
+		CacheControl: true,
+	}))
 
 	// Encrypt the cookie for end user.
 	app.Use(encryptcookie.New(encryptcookie.Config{Key: c.EncryptKey}))
@@ -61,10 +60,8 @@ func StartServer(c *config.ServerConfig) {
 		},
 	}))
 
-	if c.Debug {
-		// Add a metrics monitor.
-		app.Get("/metrics", monitor.New(monitor.Config{Title: "Talebook Monitor"}))
-	}
+	// Add a metrics monitor.
+	app.Get("/metrics", monitor.New(monitor.Config{Title: "Talebook Monitor"}))
 
 	// Add API backend.
 	registerHandlers(app)
@@ -77,12 +74,15 @@ func StartServer(c *config.ServerConfig) {
 	app.Static("/", c.GetPath("statics"))
 
 	// The frontend application.
+	statics, err := fs.Sub(c.Frontend, "app/dist")
+	if err != nil {
+		log.Fatal(err)
+	}
 	app.Use("/", filesystem.New(filesystem.Config{
-		Root:         http.FS(c.Frontend),
-		PathPrefix:   "app/dist",
-		Browse:       true,
+		Root:         http.FS(statics),
+		Browse:       false,
 		Index:        "index.html",
-		NotFoundFile: "app/dist/index.html", // We should keep this file as the not found file for frontend SPA.
+		NotFoundFile: "index.html", // We should keep this file as the not found file for frontend SPA.
 		MaxAge:       3600,
 	}))
 

@@ -49,7 +49,6 @@ func NewRootCommand() *cobra.Command {
 	calibreDB := ""
 	convert := ""
 	coverCache := 0
-	debug := false
 
 	// Create a default configuration with config value.
 	dc := config.DefaultSeverConfig()
@@ -81,7 +80,6 @@ func NewRootCommand() *cobra.Command {
 				CalibreDB:   calibreDB,
 				Convert:     convert,
 				CoverCache:  coverCache,
-				Debug:       debug,
 				Frontend:    frontend,
 			}
 
@@ -102,7 +100,6 @@ func NewRootCommand() *cobra.Command {
 	rootCmd.Flags().StringVarP(&calibreDB, "calibredb", "", dc.CalibreDB, "The full path for calibredb(.exe).")
 	rootCmd.Flags().StringVarP(&convert, "convert", "", dc.Convert, "The full path for ebook-convert(.exe).")
 	rootCmd.Flags().IntVarP(&coverCache, "cover-cache", "", dc.CoverCache, "The cover cache (MB) in memory.")
-	rootCmd.Flags().BoolVarP(&debug, "debug", "d", dc.Debug, "This shouldn't be enable in production.")
 
 	// Add version flag.
 	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)

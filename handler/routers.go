@@ -37,6 +37,7 @@ func registerHandlers(app *fiber.App) {
 	// /api/book/([0-9]+)/refer
 	// /read/([0-9]+)
 	app.Get("/api/index", book.Index)
+	app.Get("/api/book/:id<int>", book.GetBookByID)
 
 	// File Handlers
 	app.Get("/get/pcover", file.ProxyCover)

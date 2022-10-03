@@ -19,7 +19,6 @@ type ServerConfig struct {
 	CalibreDB   string   // The executable file calibredb for adding books.
 	Convert     string   // The executable file ebook-convert for converting books.
 	CoverCache  int      // The cache in memory for storing frequently accessed files, such as the book cover.
-	Debug       bool     // Enable debug log and metrics monitor and anything else.
 	Frontend    embed.FS // The embed static files.
 }
 
@@ -44,7 +43,6 @@ func DefaultSeverConfig() *ServerConfig {
 		CalibreDB:   defaultCalibreDB,
 		Convert:     defaultConvert,
 		CoverCache:  0,
-		Debug:       false,
 	}
 }
 
