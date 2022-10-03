@@ -90,6 +90,11 @@ func QueryBookCount(ctx context.Context) (result int64, err error) {
 	return
 }
 
+// QueryBookDetailByID query the given book by id.
+func QueryBookDetailByID(ctx context.Context, id int64) (book *model.Book, err error) {
+	return nil, nil
+}
+
 // QueryBooksByIDs query the books by given ids.
 func QueryBooksByIDs(ctx context.Context, ids []string) (books []model.Book, err error) {
 	if len(ids) == 0 {
