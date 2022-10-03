@@ -80,9 +80,9 @@ func StartServer(c *config.ServerConfig) {
 	app.Use("/", filesystem.New(filesystem.Config{
 		Root:         http.FS(c.Frontend),
 		PathPrefix:   "app/dist",
-		Browse:       false,
+		Browse:       true,
 		Index:        "index.html",
-		NotFoundFile: "index.html",
+		NotFoundFile: "app/dist/index.html", // We should keep this file as the not found file for frontend SPA.
 		MaxAge:       3600,
 	}))
 
