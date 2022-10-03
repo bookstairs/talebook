@@ -21,7 +21,7 @@ Golang and Node.js are required for developing. Remember to install them.
 - [ ] `/api/hot`
 - [ ] `/api/book/nav`
 - [ ] `/api/book/upload`
-- [ ] `/api/book/([0-9]+)`
+- [x] `/api/book/([0-9]+)`
 - [ ] `/api/book/([0-9]+)/delete`
 - [ ] `/api/book/([0-9]+)/edit`
 - [ ] `/api/book/([0-9]+)\.(.+)`

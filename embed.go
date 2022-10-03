@@ -6,11 +6,6 @@ import (
 	"path/filepath"
 )
 
-// This should work after the `npm run build`
-//
-//go:embed app/dist/*
-var frontend embed.FS
-
 // This would be the default calibre library to use.
 //
 //go:embed library/*

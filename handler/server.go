@@ -1,9 +1,7 @@
 package handler
 
 import (
-	"io/fs"
 	"log"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +11,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 
@@ -34,7 +31,7 @@ func StartServer(c *config.ServerConfig) {
 	// Add cache support. We will disable cache in debug mode for development purpose.
 	app.Use(cache.New(cache.Config{
 		Next: func(c *fiber.Ctx) bool {
-			return c.Query("refresh") == "true" || c.IP() == "127.0.0.1"
+			return c.Query("refresh") == "true"
 		},
 		Expiration:   30 * time.Minute,
 		CacheControl: true,
@@ -72,19 +69,6 @@ func StartServer(c *config.ServerConfig) {
 	// Allow end user to add custom frontend files.
 	// This would override the default frontend files. Use it at your own risk.
 	app.Static("/", c.GetPath("statics"))
-
-	// The frontend application.
-	statics, err := fs.Sub(c.Frontend, "app/dist")
-	if err != nil {
-		log.Fatal(err)
-	}
-	app.Use("/", filesystem.New(filesystem.Config{
-		Root:         http.FS(statics),
-		Browse:       false,
-		Index:        "index.html",
-		NotFoundFile: "index.html", // We should keep this file as the not found file for frontend SPA.
-		MaxAge:       3600,
-	}))
 
 	// Listen on given port.
 	log.Fatal(app.Listen(":" + strconv.Itoa(c.Port)))

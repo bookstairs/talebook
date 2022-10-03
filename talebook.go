@@ -80,7 +80,6 @@ func NewRootCommand() *cobra.Command {
 				CalibreDB:   calibreDB,
 				Convert:     convert,
 				CoverCache:  coverCache,
-				Frontend:    frontend,
 			}
 
 			// Create working directories and perform other checks.
