@@ -53,15 +53,6 @@ WHERE bal.book IN (%s);`
 FROM books_tags_link btl
          LEFT JOIN tags t ON btl.tag = t.id
 WHERE btl.book IN (%s);`
-
-	// Query all the formats for the given books.
-	bookFormatsQueryImpl = `SELECT b.id AS id,
-       b.title AS title,
-       b.path || '/' || d.name || '.' || LOWER(d.format) AS path,
-       d.format AS format
-FROM books b
-         LEFT JOIN data d ON b.id = d.book
-WHERE b.id IN (%s);`
 )
 
 // QueryRandomBookIDs will return random book ids from calibre.
@@ -91,8 +82,41 @@ func QueryBookCount(ctx context.Context) (result int64, err error) {
 }
 
 // QueryBookDetailByID query the given book by id.
-func QueryBookDetailByID(ctx context.Context, id int64) (book *model.Book, err error) {
-	return nil, nil
+func QueryBookDetailByID(ctx context.Context, id int64) (*model.Book, error) {
+	books, err := QueryBooksByIDs(ctx, []string{strconv.FormatInt(id, 10)})
+	if err != nil {
+		return nil, err
+	}
+	if len(books) == 0 {
+		return nil, fmt.Errorf("no such book %d exist", id)
+	}
+	book := &books[0]
+
+	// TODO Set the book owner of public status.
+	book.IsOwner = false
+	book.IsPublic = true
+
+	// Query available book files.
+	files := make([]model.BookFile, 0, 4)
+	err = Execute(ctx, "SELECT format, uncompressed_size AS size FROM data WHERE book = ?", &ExecOptions{
+		Args: []any{id},
+		ResultFunc: func(stmt *sqlite.Stmt) error {
+			format := strings.ToUpper(stmt.GetText("format"))
+			file := model.BookFile{
+				Format: format,
+				Size:   stmt.GetInt64("size"),
+				Href:   fmt.Sprintf("/api/book/%d.%s", id, format),
+			}
+			files = append(files, file)
+			return nil
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	book.Files = files
+
+	return book, nil
 }
 
 // QueryBooksByIDs query the books by given ids.
@@ -135,25 +159,6 @@ func QueryBooks(ctx context.Context, index, size int) (books []model.Book, err e
 	if err == nil {
 		books, err = bookMetadataQuery(ctx, books)
 	}
-
-	return
-}
-
-// QueryBookFormats will query the formats for the bookFormatsQueryImpl.
-func QueryBookFormats(ctx context.Context, id int64) (result []model.BookFormat, err error) {
-	// Query book formats.
-	formatsQuery := fmt.Sprintf(bookFormatsQueryImpl, strconv.FormatInt(id, 10))
-	err = Execute(ctx, formatsQuery, &ExecOptions{
-		ResultFunc: func(stmt *sqlite.Stmt) error {
-			result = append(result, model.BookFormat{
-				ID:     stmt.GetInt64("id"),
-				Title:  stmt.GetText("title"),
-				Format: stmt.GetText("format"),
-				Path:   stmt.GetText("path"),
-			})
-			return nil
-		},
-	})
 
 	return
 }
