@@ -38,6 +38,8 @@ func registerHandlers(app *fiber.App) {
 	// /read/([0-9]+)
 	app.Get("/api/index", book.Index)
 	app.Get("/api/book/:id<int>", book.GetBookByID)
+	app.Get("/api/recent", book.ListAllBook)
+	app.Get("/api/book/:id<int>.:ext", book.DownloadBookByID)
 
 	// File Handlers
 	app.Get("/get/pcover", file.ProxyCover)

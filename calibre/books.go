@@ -276,3 +276,8 @@ func bookMetadataQuery(ctx context.Context, books []model.Book) ([]model.Book, e
 
 	return books, nil
 }
+
+func ListBookByPage(ctx context.Context, start int, size int) ([]model.Book, int, error) {
+
+	return nil, 1, nil
+}

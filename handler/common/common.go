@@ -61,3 +61,8 @@ func GetParamInt(ctx *fiber.Ctx, name string) (int64, error) {
 	param := ctx.Params(name)
 	return strconv.ParseInt(param, 10, 0)
 }
+
+func GetParamString(ctx *fiber.Ctx, name string) (string, error) {
+	param := ctx.Params(name)
+	return param, nil
+}
