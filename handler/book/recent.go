@@ -1,9 +1,10 @@
 package book
 
 import (
+	"github.com/gofiber/fiber/v2"
+
 	"github.com/bookstairs/talebook/calibre"
 	"github.com/bookstairs/talebook/handler/common"
-	"github.com/gofiber/fiber/v2"
 )
 
 func ListAllBook(ctx *fiber.Ctx) error {

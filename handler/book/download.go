@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gofiber/fiber/v2"
+
 	"github.com/bookstairs/talebook/calibre"
 	"github.com/bookstairs/talebook/handler/common"
 	"github.com/bookstairs/talebook/model"
-	"github.com/gofiber/fiber/v2"
 )
 
 func DownloadBookByID(ctx *fiber.Ctx) error {

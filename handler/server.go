@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bookstairs/talebook/config"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
@@ -15,6 +14,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
+
+	"github.com/bookstairs/talebook/config"
 )
 
 // StartServer will start the talebook server.
