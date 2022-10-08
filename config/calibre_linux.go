@@ -13,9 +13,9 @@ var (
 
 func init() {
 	if _, err := os.Stat(defaultCalibreDB); errors.Is(err, os.ErrNotExist) {
-		calibreDb, err := exec.LookPath("calibredb")
+		calibreDB, err := exec.LookPath("calibredb")
 		if err == nil {
-			defaultCalibreDB = calibreDb
+			defaultCalibreDB = calibreDB
 		}
 	}
 
@@ -25,5 +25,4 @@ func init() {
 			defaultConvert = ebookConvert
 		}
 	}
-
 }
