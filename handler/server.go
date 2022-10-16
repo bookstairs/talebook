@@ -1,20 +1,21 @@
 package handler
 
 import (
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"log"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/bookstairs/talebook/config"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
+
+	"github.com/bookstairs/talebook/config"
 )
 
 // StartServer will start the talebook server.
